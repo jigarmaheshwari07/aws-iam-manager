@@ -1,0 +1,111 @@
+{% extends "base-template.html" %}
+
+{% block title %}AWS Role Analyzer - User Details{% endblock %}
+
+{% block content %}
+<section>
+    <h2>User Details: {{ user_arn }}</h2>
+
+    <!-- Search Box -->
+    <div class="mb-3">
+        <input type="text" id="accountSearchInput" class="form-control" placeholder="Search Account Name" oninput="filterAccounts()" />
+    </div>
+
+    {% for account, roles in user_details.items() %}
+        <div class="card mb-3 account-card" data-account-name="{{ account }}">
+            <div class="card-header">
+                <h3>Account: {{ account }}</h3>
+            </div>
+            <div class="card-body">
+                <!-- Role Tabs -->
+                <ul class="nav nav-tabs" id="roleTabs-{{ account|replace(' ', '-') }}" role="tablist">
+                    {% for role in roles %}
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" data-bs-toggle="tab" href="#content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" role="tab" aria-controls="content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ role }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="roleTabsContent-{{ account|replace(' ', '-') }}">
+                    {% for role, details in roles.items() %}
+                        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" role="tabpanel" aria-labelledby="tab-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}">
+                            <div class="card-body">
+                                {% if details.attached_policies %}
+                                    <h5>Attached Policies:</h5>
+                                    <ul class="list-group mb-3">
+                                        {% for policy in details.attached_policies %}
+                                            {% set unique_id = account ~ '-' ~ role ~ '-' ~ policy.name %}
+                                            <li class="list-group-item">
+                                                <span class="policy-name" style="cursor:pointer;" onclick="togglePolicy('{{ unique_id }}')">
+                                                    <i class="fas fa-caret-down"></i> {{ policy.name }}
+                                                </span>
+                                                <pre id="{{ unique_id }}" class="policy-document" style="display: none;">{{ policy.document }}</pre>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No attached policies available.</p>
+                                {% endif %}
+
+                                {% if details.inline_policies %}
+                                    <h5>Inline Policies:</h5>
+                                    <ul class="list-group mb-3">
+                                        {% for policy in details.inline_policies %}
+                                            {% set unique_id = account ~ '-' ~ role ~ '-' ~ policy.name %}
+                                            <li class="list-group-item">
+                                                <span class="policy-name" style="cursor:pointer;" onclick="togglePolicy('{{ unique_id }}')">
+                                                    <i class="fas fa-caret-down"></i> {{ policy.name }}
+                                                </span>
+                                                <pre id="{{ unique_id }}" class="policy-document" style="display: none;">{{ policy.document }}</pre>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <a href="{{ url_for('main.trusted_users') }}" class="btn btn-primary">Back to Trusted Users</a>
+</section>
+
+<script>
+    function togglePolicy(policyId) {
+        var policyElement = document.getElementById(policyId);
+        if (policyElement.style.display === "none") {
+            policyElement.style.display = "block";
+        } else {
+            policyElement.style.display = "none";
+        }
+    }
+
+    function filterAccounts() {
+        const input = document.getElementById('accountSearchInput');
+        const filter = input.value.toLowerCase();
+        const accountCards = document.querySelectorAll('.account-card');
+
+        accountCards.forEach(card => {
+            const accountName = card.getAttribute('data-account-name').toLowerCase();
+            card.style.display = accountName.includes(filter) ? '' : 'none';
+        });
+    }
+    function togglePolicy(policyId) {
+        // Get the policy element to toggle
+        const policyElement = document.getElementById(policyId);
+    
+        // Close all other policy documents
+        document.querySelectorAll('.policy-document').forEach(element => {
+            if (element !== policyElement) {
+                element.style.display = "none";
+            }
+        });
+    
+        // Toggle the clicked policy document
+        policyElement.style.display = policyElement.style.display === "none" ? "block" : "none";
+    }
+    
+</script>
+{% endblock %}

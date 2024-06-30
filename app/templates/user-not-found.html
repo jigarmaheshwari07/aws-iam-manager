@@ -1,0 +1,9 @@
+{% extends "base-template.html" %}
+
+{% block title %}AWS Role Analyzer - User Not Found{% endblock %}
+
+{% block content %}
+    <h2>User Not Found</h2>
+    <p>No trusted user found for ARN: {{ user_arn }}</p>
+    <a href="{{ url_for('trusted_users') }}" class="btn">Back to Trusted Users</a>
+{% endblock %}

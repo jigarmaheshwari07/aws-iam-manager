@@ -1,0 +1,260 @@
+{% extends "base-template.html" %}
+
+{% block title %}AWS Role Analyzer - Account Details{% endblock %}
+
+{% block content %}
+<section>
+  <h2>Account: {{ account.account_name }}</h2>
+
+  <!-- Navigation Tabs -->
+  <ul class="nav nav-tabs" id="accountDetailsTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="roles-tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true">Roles</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="trusted-users-tab" data-bs-toggle="tab" href="#trusted-users" role="tab" aria-controls="trusted-users" aria-selected="false">Trusted Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="iam-users-tab" data-bs-toggle="tab" href="#iam-users" role="tab" aria-controls="iam-users" aria-selected="false">IAM Users</a>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="accountDetailsTabContent">
+    
+    <!-- Roles Tab -->
+    <div class="tab-pane fade show active" id="roles" role="tabpanel" aria-labelledby="roles-tab">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3>Roles</h3>
+          <input type="text" id="roleSearchInput" class="form-control mb-3" placeholder="Search Roles" oninput="filterList('roleSearchInput', 'role-item')" />
+        </div>
+        <div class="card-body">
+          <ul class="list-group" id="roleList">
+            {% for role in roles %}
+            <li class="list-group-item role-item">
+              <span style="cursor: pointer" onclick="showRoleDetails('{{ role.role_name }}', this)">{{ role.role_name }}</span>
+              <div id="details-{{ role.role_name }}" class="role-details" style="display: none;"></div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trusted Users Tab -->
+<div class="tab-pane fade" id="trusted-users" role="tabpanel" aria-labelledby="trusted-users-tab">
+  <div class="card mb-3">
+    <div class="card-header">
+      <h3>Trusted Users</h3>
+      <input type="text" id="trustedUserSearchInput" class="form-control mb-3" placeholder="Search Trusted Users" oninput="filterTrustedUsers()" />
+    </div>
+    <div class="card-body">
+      <ul class="list-group" id="trustedUserList">
+        {% if trusted_users %}
+        {% for role, users in trusted_users.items() %}
+        <li class="list-group-item trusted-user-role">
+          <strong>Role: {{ role }}</strong>
+          <ul class="list-group mt-2 trusted-user-list">
+            {% for user in users %}
+            <li class="list-group-item trusted-user-item">
+              <a href="{{ url_for('main.user_details', user_arn=user.user_arn) }}">{{ user.user_arn }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li class="list-group-item">No trusted users found for this account.</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+    <!-- IAM Users Tab -->
+    <div class="tab-pane fade" id="iam-users" role="tabpanel" aria-labelledby="iam-users-tab">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3>IAM Users</h3>
+          <input type="text" id="userSearchInput" class="form-control mb-3" placeholder="Search IAM Users" oninput="filterList('userSearchInput', 'user-item')" />
+        </div>
+        <div class="card-body">
+          <ul class="list-group" id="userList">
+            {% for user in users %}
+            <li class="list-group-item user-item">
+              <span style="cursor: pointer" onclick="showUserDetails('{{ user.user_name }}', this)">{{ user.user_name }}</span>
+              <div id="details-{{ user.user_name }}" class="user-details" style="display: none;"></div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">Back to Accounts</a>
+</section>
+
+<script>
+
+ // Function to filter list items based on search input
+  function filterList(inputId, itemClass) {
+    const input = document.getElementById(inputId);
+    const filter = input.value.toLowerCase();
+    const items = document.querySelectorAll(`.${itemClass}`);
+
+    items.forEach(item => {
+      const text = item.textContent || item.innerText;
+      item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
+    });
+  }
+
+  // Function to filter both roles and users within the "Trusted Users" section
+  function filterTrustedUsers() {
+    const input = document.getElementById('trustedUserSearchInput');
+    const filter = input.value.toLowerCase();
+    const roles = document.querySelectorAll('.trusted-user-role');
+
+    roles.forEach(role => {
+      const roleTitle = role.querySelector('strong').textContent.toLowerCase();
+      const users = role.querySelectorAll('.trusted-user-item');
+      let roleVisible = false;
+
+      users.forEach(user => {
+        const userName = user.textContent.toLowerCase();
+        if (userName.includes(filter) || roleTitle.includes(filter)) {
+          user.style.display = '';
+          roleVisible = true;
+        } else {
+          user.style.display = 'none';
+        }
+      });
+
+      // Show the role if any nested user matches the filter, or if the role itself matches
+      role.style.display = roleVisible ? '' : 'none';
+    });
+  }
+
+  // Function to show role details
+  function showRoleDetails(roleName, element) {
+    const accountId = {{ account.id }};
+    const detailsContainer = document.getElementById(`details-${roleName}`);
+
+    if (detailsContainer.style.display === "block") {
+      detailsContainer.style.display = "none";
+      return;
+    }
+
+    // Hide other open details
+    document.querySelectorAll('.role-details').forEach(container => {
+      container.style.display = 'none';
+    });
+
+    fetch(`/role/${accountId}/${roleName}`)
+      .then(response => response.json())
+      .then(data => {
+        let roleDetailsHTML = '';
+
+        if (data.attached_policies.length > 0) {
+          roleDetailsHTML += generatePoliciesHTML('Attached Policies', data.attached_policies, roleName);
+        }
+
+        if (data.inline_policies.length > 0) {
+          roleDetailsHTML += generatePoliciesHTML('Inline Policies', data.inline_policies, roleName);
+        }
+
+        detailsContainer.innerHTML = roleDetailsHTML;
+        detailsContainer.style.display = "block";
+      })
+      .catch(error => {
+        console.error('Error fetching role details:', error);
+        alert('Failed to fetch role details. Please try again.');
+      });
+  }
+
+  // Function to show user details
+  function showUserDetails(userName, element) {
+    const accountId = {{ account.id }};
+    const detailsContainer = document.getElementById(`details-${userName}`);
+
+    if (detailsContainer.style.display === "block") {
+      detailsContainer.style.display = "none";
+      return;
+    }
+
+    // Hide other open details
+    document.querySelectorAll('.user-details').forEach(container => {
+      container.style.display = 'none';
+    });
+
+    fetch(`/user/${accountId}/${userName}`)
+      .then(response => response.json())
+      .then(data => {
+        let userDetailsHTML = '';
+
+        if (data.attached_policies.length > 0) {
+          userDetailsHTML += generatePoliciesHTML('Attached Policies', data.attached_policies, userName);
+        }
+
+        if (data.inline_policies.length > 0) {
+          userDetailsHTML += generatePoliciesHTML('Inline Policies', data.inline_policies, userName);
+        }
+
+        detailsContainer.innerHTML = userDetailsHTML;
+        detailsContainer.style.display = "block";
+      })
+      .catch(error => {
+        console.error('Error fetching user details:', error);
+        alert('Failed to fetch user details. Please try again.');
+      });
+  }
+
+  // Function to toggle policy document visibility
+  function togglePolicy(policyName, parentName) {
+    const policyElement = document.getElementById(`${parentName}-${policyName}`);
+
+    document.querySelectorAll('.policy-document').forEach(element => {
+      if (element !== policyElement) {
+        element.style.display = "none";
+      }
+    });
+
+    policyElement.style.display = policyElement.style.display === "none" ? "block" : "none";
+  }
+
+  // Helper function to generate policy HTML
+  function generatePoliciesHTML(title, policies, parentName) {
+    let html = `<div class="card mt-3"><div class="card-body"><h5>${title}:</h5><ul class="list-group mb-3">`;
+
+    policies.forEach(policy => {
+      html += `
+        <li class="list-group-item">
+          <span class="policy-name" style="cursor: pointer" onclick="togglePolicy('${policy.name}', '${parentName}')">
+            <i class="fas fa-caret-down"></i> ${policy.name}
+          </span>
+          <pre id="${parentName}-${policy.name}" class="policy-document" style="display: none">${JSON.stringify(policy.document, null, 2)}</pre>
+        </li>`;
+    });
+
+    html += `</ul></div></div>`;
+    return html;
+  }
+
+  // Function to filter list items based on search input
+  function filterList(inputId, itemClass) {
+    const input = document.getElementById(inputId);
+    const filter = input.value.toLowerCase();
+    const items = document.querySelectorAll(`.${itemClass}`);
+
+    items.forEach(item => {
+      const text = item.textContent || item.innerText;
+      item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
+    });
+  }
+</script>
+
+
+<!-- Bootstrap JS (including Popper) -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

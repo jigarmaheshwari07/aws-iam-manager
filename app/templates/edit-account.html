@@ -1,0 +1,28 @@
+{% extends "base-template.html" %}
+
+{% block title %}Edit Account{% endblock %}
+
+{% block content %}
+    <div style="display: flex; align-items: center;">
+        <h1 style="margin-right: auto;">Edit Account</h1>
+        <a href="{{ url_for('main.manage_accounts') }}" class="btn btn-secondary">Back</a>
+    </div>
+    <form method="post" action="{{ url_for('main.edit_account', account_id=account.id) }}">
+        <div class="form-group">
+            <label for="account_name">Account Name:</label>
+            <input type="text" class="form-control" id="account_name" name="account_name" value="{{ account.account_name }}">
+        </div>
+        <div class="form-group">
+            <label for="role_arn">Role ARN:</label>
+            <input type="text" class="form-control" id="role_arn" name="role_arn" value="{{ account.role_arn }}">
+        </div>
+        <div class="form-group">
+            <label for="roles_to_analyze">Roles to Analyze:</label>
+            <input type="text" class="form-control" id="roles_to_analyze" name="roles_to_analyze" data-role="tagsinput" value="{{ account.roles_to_analyze | join(',') }}">
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Update Account</button>
+    </form>
+    
+  
+{% endblock %}

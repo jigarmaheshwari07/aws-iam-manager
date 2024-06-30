@@ -1,0 +1,38 @@
+{% extends "base-template.html" %}
+
+{% block title %}AWS Role Analyzer - Trusted Users{% endblock %}
+
+{% block content %}
+    <section>
+        <h2>Trusted Users</h2>
+        <div class="input-group mb-3">
+            <input type="text" id="searchTrustedUsersInput" onkeyup="searchTrustedUsers()" class="form-control" placeholder="Search for a trusted user...">
+        </div>
+        <ul id="trustedUserList" class="list-group">
+            {% for user_arn, roles in trusted_users.items() %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('main.user_details', user_arn=user_arn) }}">{{ user_arn }}</a>
+                    
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <script>
+        function searchTrustedUsers() {
+            let input = document.getElementById("searchTrustedUsersInput");
+            let filter = input.value.toUpperCase();
+            let ul = document.getElementById("trustedUserList");
+            let li = ul.getElementsByTagName("li");
+
+            for (let i = 0; i < li.length; i++) {
+                let userArn = li[i].querySelector("a").textContent || li[i].querySelector("a").innerText;
+                if (userArn.toUpperCase().indexOf(filter) > -1) {
+                    li[i].style.display = "";
+                } else {
+                    li[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+{% endblock %}
