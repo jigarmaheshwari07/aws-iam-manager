@@ -3,43 +3,44 @@
 {% block title %}Add Account{% endblock %}
 
 {% block content %}
-    <h1>Add Account</h1>
+<section class="container mx-auto px-4 jetbrains-mono-custom">
+    <h1 class="text-2xl font-bold mb-4 text-white margarine-regular">Add Account</h1>
     
-    <form method="post" action="{{ url_for('main.add_account') }}" class="needs-validation" novalidate>
+    <form method="post" action="{{ url_for('main.add_account') }}" class="needs-validation space-y-4" novalidate>
         <div class="form-group">
-            <label for="account_id">Account ID:</label>
-            <input type="text" class="form-control" id="account_id" name="account_id" required>
-            <div class="invalid-feedback">
+            <label for="account_id" class="block text-lg text-white font-extrabold mb-2">Account ID:</label>
+            <input type="text" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" id="account_id" name="account_id" required>
+            <div class="text-red-500 text-sm mt-1 hidden">
                 Please provide an account ID.
             </div>
         </div>
         <div class="form-group">
-            <label for="account_name">Account Name:</label>
-            <input type="text" class="form-control" id="account_name" name="account_name" required>
-            <div class="invalid-feedback">
+            <label for="account_name" class="block text-lg text-white font-extrabold mb-2">Account Name:</label>
+            <input type="text" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" id="account_name" name="account_name" required>
+            <div class="text-red-500 text-sm mt-1 hidden">
                 Please provide an account name.
             </div>
         </div>
         <div class="form-group">
-            <label for="role_arn">Role ARN:</label>
-            <input type="text" class="form-control" id="role_arn" name="role_arn" required>
-            <div class="invalid-feedback">
+            <label for="role_arn" class="block text-lg text-white font-extrabold mb-2">Role ARN:</label>
+            <input type="text" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" id="role_arn" name="role_arn" required>
+            <div class="text-red-500 text-sm mt-1 hidden">
                 Please provide a role ARN.
             </div>
         </div>
         <div class="form-group">
-            <label for="roles_to_analyze">Roles to Analyze:</label>
-            <input type="text" class="form-control" id="roles_to_analyze" name="roles_to_analyze" data-role="tagsinput" required>
-            <div class="invalid-feedback">
+            <label for="roles_to_analyze" class="block text-lg text-white font-extrabold mb-2">Roles to Analyze:</label>
+            <input type="text" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" id="roles_to_analyze" name="roles_to_analyze" required>
+            <div class="text-red-500 text-sm mt-1 hidden">
                 Please provide roles to analyze.
             </div>
         </div>
         <br>
-        <button type="submit" class="btn btn-primary">Add Account</button>
+        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md">Add Account</button>
     </form>
 
     <script>
-        // JavaScript for Bootstrap form validation
+        // JavaScript for form validation
         (function () {
             'use strict';
             var forms = document.querySelectorAll('.needs-validation');
@@ -55,4 +56,5 @@
                 });
         })();
     </script>
+</section>
 {% endblock %}

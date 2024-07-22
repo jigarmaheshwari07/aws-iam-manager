@@ -3,26 +3,51 @@
 {% block title %}Edit Account{% endblock %}
 
 {% block content %}
-    <div style="display: flex; align-items: center;">
-        <h1 style="margin-right: auto;">Edit Account</h1>
-        <a href="{{ url_for('main.manage_accounts') }}" class="btn btn-secondary">Back</a>
+<section class="container mx-auto px-4 jetbrains-mono-custom">
+    <div class="flex items-center mb-4">
+        <h1 class="text-2xl font-bold text-white margarine-regular mr-auto">Edit Account</h1>
+        <a href="{{ url_for('main.manage_accounts') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md">Back</a>
     </div>
-    <form method="post" action="{{ url_for('main.edit_account', account_id=account.id) }}">
+
+    <form method="post" action="{{ url_for('main.edit_account', account_id=account.id) }}" class="needs-validation space-y-4" novalidate>
         <div class="form-group">
-            <label for="account_name">Account Name:</label>
-            <input type="text" class="form-control" id="account_name" name="account_name" value="{{ account.account_name }}">
+            <label for="account_name" class="block text-lg text-white font-extrabold mb-2">Account Name:</label>
+            <input type="text" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" id="account_name" name="account_name" value="{{ account.account_name }}" required>
+            <div class="text-red-500 text-sm mt-1 hidden">
+                Please provide an account name.
+            </div>
         </div>
         <div class="form-group">
-            <label for="role_arn">Role ARN:</label>
-            <input type="text" class="form-control" id="role_arn" name="role_arn" value="{{ account.role_arn }}">
+            <label for="role_arn" class="block text-lg text-white font-extrabold mb-2">Role ARN:</label>
+            <input type="text" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" id="role_arn" name="role_arn" value="{{ account.role_arn }}" required>
+            <div class="text-red-500 text-sm mt-1 hidden">
+                Please provide a role ARN.
+            </div>
         </div>
         <div class="form-group">
-            <label for="roles_to_analyze">Roles to Analyze:</label>
-            <input type="text" class="form-control" id="roles_to_analyze" name="roles_to_analyze" data-role="tagsinput" value="{{ account.roles_to_analyze | join(',') }}">
+            <label for="roles_to_analyze" class="block text-lg text-white font-extrabold mb-2">Roles to Analyze:</label>
+            <div class="flex flex-wrap gap-2 p-2 bg-white border border-gray-300 rounded-md">
+                <div id="roles_container" class="flex flex-wrap gap-2">
+                    {% for role in account.roles_to_analyze %}
+                    <div class="bg-orange-500 text-white border border-white rounded-full px-3 py-1 flex items-center space-x-2">
+                        <span>{{ role }}</span>
+                        <button type="button" class="text-white focus:outline-none" onclick="removeRole(this)">&times;</button>
+                        <input type="hidden" name="roles_to_analyze[]" value="{{ role }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="text" id="roles_input" class="flex-grow py-1 px-2 focus:outline-none placeholder-orange-800 text-orange-500 font-bold" placeholder="Add role" onkeydown="addRole(event)">
+            </div>
+            <div class="text-red-500 text-sm mt-1 hidden">
+                Please provide roles to analyze.
+            </div>
         </div>
         <br>
-        <button type="submit" class="btn btn-primary">Update Account</button>
+        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md">Update Account</button>
     </form>
-    
-  
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/edit_account.js') }}"></script>
 {% endblock %}

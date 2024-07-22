@@ -3,36 +3,51 @@
 {% block title %}AWS Role Analyzer - Trusted Users{% endblock %}
 
 {% block content %}
-    <section>
-        <h2>Trusted Users</h2>
-        <div class="input-group mb-3">
-            <input type="text" id="searchTrustedUsersInput" onkeyup="searchTrustedUsers()" class="form-control" placeholder="Search for a trusted user...">
-        </div>
-        <ul id="trustedUserList" class="list-group">
-            {% for user_arn, roles in trusted_users.items() %}
-                <li class="list-group-item">
-                    <a href="{{ url_for('main.user_details', user_arn=user_arn) }}">{{ user_arn }}</a>
-                    
-                </li>
-            {% endfor %}
-        </ul>
-    </section>
+<section class="container mx-auto px-4 jetbrains-mono-custom">
+    <h1 class="text-2xl font-bold mb-4 text-white margarine-regular">Trusted Users</h1>
+    
+    <!-- Search Input -->
+    <div class="relative flex-grow mb-3">
+        <span class="sr-only">Search</span>
+        <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+            <!-- SVG icon for search -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-orange-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+        </span>
+        <input id="searchTrustedUsersInput" onkeyup="searchTrustedUsers()" class="placeholder-orange-600 block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" 
+               placeholder="Search for a trusted user..." 
+               type="text" 
+               aria-label="Search">
+    </div>
 
-    <script>
-        function searchTrustedUsers() {
-            let input = document.getElementById("searchTrustedUsersInput");
-            let filter = input.value.toUpperCase();
-            let ul = document.getElementById("trustedUserList");
-            let li = ul.getElementsByTagName("li");
+    <!-- Trusted Users List -->
+    <ul id="trustedUserList" class="list-group divide-y divide-gray-300">
+        {% for user_arn, roles in trusted_users.items() %}
+        <li class="list-group-item py-2">
+            <a href="{{ url_for('main.user_details', user_arn=user_arn) }}" class="text-orange-500 ">
+                {{ user_arn }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
 
-            for (let i = 0; i < li.length; i++) {
-                let userArn = li[i].querySelector("a").textContent || li[i].querySelector("a").innerText;
-                if (userArn.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
-                } else {
-                    li[i].style.display = "none";
-                }
+<script>
+    function searchTrustedUsers() {
+        let input = document.getElementById("searchTrustedUsersInput");
+        let filter = input.value.toUpperCase();
+        let ul = document.getElementById("trustedUserList");
+        let li = ul.getElementsByTagName("li");
+
+        for (let i = 0; i < li.length; i++) {
+            let userArn = li[i].querySelector("a").textContent || li[i].querySelector("a").innerText;
+            if (userArn.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
             }
         }
-    </script>
+    }
+</script>
 {% endblock %}

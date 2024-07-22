@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.anton-regular {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+
+  .margarine-regular {
+    font-family: "Margarine", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+/* Hover effect for navigation links */
+.relative {
+  position: relative;
+}
+
+.relative:hover .underline-effect {
+  width: 100%;
+}
+
+.underline-effect {
+  width: 0%;
+  height: 0.1rem;
+  bottom: 0;
+  left: 0;
+  background-color: #F97316; /* Orange color */
+}
+
+.jetbrains-mono-custom {
+  font-family: "JetBrains Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 500; /* Adjust weight as needed, e.g., 100, 200, ..., 800 */
+  font-style: normal;
+}
+
+
+.jetbrains-mono-custom-bold {
+  font-family: "JetBrains Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 600; /* Adjust weight as needed, e.g., 100, 200, ..., 800 */
+  font-style: normal;
+}
+

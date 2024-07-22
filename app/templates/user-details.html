@@ -3,25 +3,25 @@
 {% block title %}AWS Role Analyzer - User Details{% endblock %}
 
 {% block content %}
-<section>
-    <h2>User Details: {{ user_arn }}</h2>
+<section class="container mx-auto px-4 jetbrains-mono-custom">
+    <h2 class="text-2xl font-bold mb-4 text-white margarine-regular">User Details: {{ user_arn }}</h2>
 
     <!-- Search Box -->
     <div class="mb-3">
-        <input type="text" id="accountSearchInput" class="form-control" placeholder="Search Account Name" oninput="filterAccounts()" />
+        <input type="text" id="accountSearchInput" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm" placeholder="Search Account Name" oninput="filterAccounts()" />
     </div>
 
     {% for account, roles in user_details.items() %}
-        <div class="card mb-3 account-card" data-account-name="{{ account }}">
-            <div class="card-header">
-                <h3>Account: {{ account }}</h3>
+        <div class="mb-3 p-4 bg-white border border-gray-300 rounded-md shadow-sm account-card" data-account-name="{{ account }}">
+            <div class="mb-2">
+                <h3 class="text-xl font-bold text-orange-600">Account: {{ account }}</h3>
             </div>
-            <div class="card-body">
+            <div>
                 <!-- Role Tabs -->
-                <ul class="nav nav-tabs" id="roleTabs-{{ account|replace(' ', '-') }}" role="tablist">
+                <ul class="flex flex-wrap mb-3 border-b border-gray-200" id="roleTabs-{{ account|replace(' ', '-') }}" role="tablist">
                     {% for role in roles %}
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" data-bs-toggle="tab" href="#content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" role="tab" aria-controls="content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ role }}</a>
+                        <li class="mr-2" role="presentation">
+                            <a class="inline-block p-2 text-orange-500 hover:text-orange-600 {% if loop.first %}text-white bg-orange-600 rounded-t-lg{% else %}border-b-2 border-transparent{% endif %}" id="tab-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" data-bs-toggle="tab" href="#content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" role="tab" aria-controls="content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ role }}</a>
                         </li>
                     {% endfor %}
                 </ul>
@@ -30,34 +30,34 @@
                 <div class="tab-content" id="roleTabsContent-{{ account|replace(' ', '-') }}">
                     {% for role, details in roles.items() %}
                         <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="content-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}" role="tabpanel" aria-labelledby="tab-{{ account|replace(' ', '-') }}-{{ role|replace(' ', '-') }}">
-                            <div class="card-body">
+                            <div class="p-4">
                                 {% if details.attached_policies %}
-                                    <h5>Attached Policies:</h5>
+                                    <h5 class="text-lg font-semibold text-orange-600 mb-2">Attached Policies:</h5>
                                     <ul class="list-group mb-3">
                                         {% for policy in details.attached_policies %}
                                             {% set unique_id = account ~ '-' ~ role ~ '-' ~ policy.name %}
-                                            <li class="list-group-item">
-                                                <span class="policy-name" style="cursor:pointer;" onclick="togglePolicy('{{ unique_id }}')">
+                                            <li class="p-2 bg-gray-100 border border-gray-300 rounded-md mb-2">
+                                                <span class="cursor-pointer text-orange-600" onclick="togglePolicy('{{ unique_id }}')">
                                                     <i class="fas fa-caret-down"></i> {{ policy.name }}
                                                 </span>
-                                                <pre id="{{ unique_id }}" class="policy-document" style="display: none;">{{ policy.document }}</pre>
+                                                <pre id="{{ unique_id }}" class="policy-document hidden p-2 mt-2 bg-white border border-gray-300 rounded-md">{{ policy.document }}</pre>
                                             </li>
                                         {% endfor %}
                                     </ul>
                                 {% else %}
-                                    <p>No attached policies available.</p>
+                                    <p class="text-gray-500">No attached policies available.</p>
                                 {% endif %}
 
                                 {% if details.inline_policies %}
-                                    <h5>Inline Policies:</h5>
+                                    <h5 class="text-lg font-semibold text-orange-600 mb-2">Inline Policies:</h5>
                                     <ul class="list-group mb-3">
                                         {% for policy in details.inline_policies %}
                                             {% set unique_id = account ~ '-' ~ role ~ '-' ~ policy.name %}
-                                            <li class="list-group-item">
-                                                <span class="policy-name" style="cursor:pointer;" onclick="togglePolicy('{{ unique_id }}')">
+                                            <li class="p-2 bg-gray-100 border border-gray-300 rounded-md mb-2">
+                                                <span class="cursor-pointer text-orange-600" onclick="togglePolicy('{{ unique_id }}')">
                                                     <i class="fas fa-caret-down"></i> {{ policy.name }}
                                                 </span>
-                                                <pre id="{{ unique_id }}" class="policy-document" style="display: none;">{{ policy.document }}</pre>
+                                                <pre id="{{ unique_id }}" class="policy-document hidden p-2 mt-2 bg-white border border-gray-300 rounded-md">{{ policy.document }}</pre>
                                             </li>
                                         {% endfor %}
                                     </ul>
@@ -69,43 +69,10 @@
             </div>
         </div>
     {% endfor %}
-    <a href="{{ url_for('main.trusted_users') }}" class="btn btn-primary">Back to Trusted Users</a>
+    <a href="{{ url_for('main.trusted_users') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md">Back to Trusted Users</a>
 </section>
 
-<script>
-    function togglePolicy(policyId) {
-        var policyElement = document.getElementById(policyId);
-        if (policyElement.style.display === "none") {
-            policyElement.style.display = "block";
-        } else {
-            policyElement.style.display = "none";
-        }
-    }
-
-    function filterAccounts() {
-        const input = document.getElementById('accountSearchInput');
-        const filter = input.value.toLowerCase();
-        const accountCards = document.querySelectorAll('.account-card');
-
-        accountCards.forEach(card => {
-            const accountName = card.getAttribute('data-account-name').toLowerCase();
-            card.style.display = accountName.includes(filter) ? '' : 'none';
-        });
-    }
-    function togglePolicy(policyId) {
-        // Get the policy element to toggle
-        const policyElement = document.getElementById(policyId);
-    
-        // Close all other policy documents
-        document.querySelectorAll('.policy-document').forEach(element => {
-            if (element !== policyElement) {
-                element.style.display = "none";
-            }
-        });
-    
-        // Toggle the clicked policy document
-        policyElement.style.display = policyElement.style.display === "none" ? "block" : "none";
-    }
-    
-</script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/user_details.js') }}"></script>
+{% endblock %}
 {% endblock %}

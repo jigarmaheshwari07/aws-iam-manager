@@ -109,3 +109,12 @@ ehthumbs.db
 # Other
 *.bak
 *.swp
+
+#node_module
+./node_module
+
+#database
+./instance/aws_roles1.db
+
+#venv
+./.venv/*

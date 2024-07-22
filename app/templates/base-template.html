@@ -1,77 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AWS Role Analyzer{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Margarine&display=swap">
+    <link href="{{ url_for('static', filename='css/main.css')}}" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <h1>AWS Role Analyzer</h1>
-    </header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <!-- Brand/Home Link -->
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">AWS Role Analyzer</a>
 
-            <!-- Toggler button for small screens -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<body class="bg-green-900">
+    <nav class="bg-none p-2 margarine-regular">
+        <div class="container mx-auto flex items-center justify-between">
+            <!-- Header section with Home link -->
+            <div class="flex items-center">
+                <a href="{{ url_for('main.index') }}" class="flex items-center text-2xl font-bold text-white">
+                    <span class="mr-2 mt-2 before:block before:absolute before:-inset-1 before:-skew-y-3 before:bg-orange-500 relative inline-block">
+                        <span class="relative text-white">AWS WHERE IAM?</span>
+                    </span>
+                </a>
+            </div>
 
             <!-- Navbar links and dropdowns -->
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <div class="flex items-center space-x-4">
+                <ul class="flex space-x-4 text-white">
                     <!-- Main Navigation Links -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.trusted_users') }}">Trusted Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.manage_accounts') }}">Manage Accounts</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.add_account') }}">Add Account</a>
-                    </li>
-                </ul>
-
-                <!-- Actions Dropdown -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Actions
+                    <li>
+                        <a class="block px-2 py-1 relative" href="{{ url_for('main.index') }}" data-content="Home">
+                            Home
+                            <span class="absolute inset-x-0 bottom-0 h-0.5 underline-effect transition-all duration-300"></span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-                            <li><a class="dropdown-item" href="{{ url_for('main.update_data') }}">Update Data</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('main.export_to_excel') }}">Export Data</a></li>
-                        </ul>
+                    </li>
+                    <li>
+                        <a class="block px-2 py-1 relative" href="{{ url_for('main.trusted_users') }}" data-content="Trusted Users">
+                            Trusted Users
+                            <span class="absolute inset-x-0 bottom-0 h-0.5 underline-effect transition-all duration-300"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="block px-2 py-1 relative" href="{{ url_for('main.manage_accounts') }}" data-content="Manage Accounts">
+                            Manage Accounts
+                            <span class="absolute inset-x-0 bottom-0 h-0.5 underline-effect transition-all duration-300"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="block px-2 py-1 relative" href="{{ url_for('main.add_account') }}" data-content="Add Account">
+                            Add Account
+                            <span class="absolute inset-x-0 bottom-0 h-0.5 underline-effect transition-all duration-300"></span>
+                        </a>
                     </li>
                 </ul>
+                
+
+                <!-- Action Button with Dropdown -->
+                <div class="relative">
+                    <button id="actionButton" class="flex items-center px-4 py-2 text-white focus:outline-none">
+                        <span>Action</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-4 ml-1 animate-pulse">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
+                        </svg>
+                    </button>
+                    <ul id="actionDropdown" class="hidden absolute left-0 mt-2 w-48 bg-orange-500 text-white rounded-md">
+                        <li><a class="block px-4 py-2 hover:bg-white hover:text-orange-600 rounded-md" href="{{ url_for('main.update_data') }}">Update Data</a></li>
+                        <li><a class="block px-4 py-2 hover:bg-white hover:text-orange-600 rounded-md" href="{{ url_for('main.export_to_excel') }}">Export Data</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main>
-        <div class="container mt-3">
+    <main class="container mx-auto mt-4">
+        <div class="mb-4">
             <!-- Flash messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="alert">
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+            {% if messages %}
+            <div>
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% endwith %}
         </div>
+
         {% block content %}
         {% endblock %}
     </main>
@@ -80,5 +95,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+    <script src="../static/js/navbar.js" defer></script>
 </body>
+
 </html>

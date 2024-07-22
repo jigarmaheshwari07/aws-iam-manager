@@ -3,19 +3,19 @@
 {% block title %}AWS Role Analyzer - Account Details{% endblock %}
 
 {% block content %}
-<section>
-  <h2>Account: {{ account.account_name }}</h2>
+<section class="container mx-auto px-4 jetbrains-mono-custom">
+  <h2 class="text-2xl font-bold mb-4 text-white margarine-regular">Account: {{ account.account_name }}</h2>
 
   <!-- Navigation Tabs -->
-  <ul class="nav nav-tabs" id="accountDetailsTab" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="roles-tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true">Roles</a>
+  <ul class="flex mb-4 border-b border-gray-200" id="accountDetailsTab" role="tablist">
+    <li class="mr-2">
+      <a class="inline-block p-2 text-orange-500 hover:text-orange-600 text-white bg-orange-600 rounded-t-lg" id="roles-tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true">Roles</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" id="trusted-users-tab" data-bs-toggle="tab" href="#trusted-users" role="tab" aria-controls="trusted-users" aria-selected="false">Trusted Users</a>
+    <li class="mr-2">
+      <a class="inline-block p-2 text-orange-500 hover:text-orange-600" id="trusted-users-tab" data-bs-toggle="tab" href="#trusted-users" role="tab" aria-controls="trusted-users" aria-selected="false">Trusted Users</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" id="iam-users-tab" data-bs-toggle="tab" href="#iam-users" role="tab" aria-controls="iam-users" aria-selected="false">IAM Users</a>
+    <li class="mr-2">
+      <a class="inline-block p-2 text-orange-500 hover:text-orange-600" id="iam-users-tab" data-bs-toggle="tab" href="#iam-users" role="tab" aria-controls="iam-users" aria-selected="false">IAM Users</a>
     </li>
   </ul>
 
@@ -23,17 +23,20 @@
     
     <!-- Roles Tab -->
     <div class="tab-pane fade show active" id="roles" role="tabpanel" aria-labelledby="roles-tab">
-      <div class="card mb-3">
-        <div class="card-header">
-          <h3>Roles</h3>
-          <input type="text" id="roleSearchInput" class="form-control mb-3" placeholder="Search Roles" oninput="filterList('roleSearchInput', 'role-item')" />
+      <div class="mb-3 p-4 bg-white border border-gray-300 rounded-md shadow-sm">
+        <div class="mb-2">
+          <h3 class="text-xl font-bold text-orange-600">Roles</h3>
+          <input type="text" id="roleSearchInput" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm mb-3" placeholder="Search Roles" oninput="filterList('roleSearchInput', 'role-item')" />
         </div>
-        <div class="card-body">
-          <ul class="list-group" id="roleList">
+        <div>
+          <ul id="roleList" class="list-group space-y-2">
             {% for role in roles %}
-            <li class="list-group-item role-item">
-              <span style="cursor: pointer" onclick="showRoleDetails('{{ role.role_name }}', this)">{{ role.role_name }}</span>
-              <div id="details-{{ role.role_name }}" class="role-details" style="display: none;"></div>
+            <li class="list-group-item role-item p-2 bg-gray-100 border border-gray-300 rounded-md">
+              <div class="flex justify-between items-center">
+                <span class="text-orange-600">{{ role.role_name }}</span>
+                  <button class="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md" onclick="showRoleDetails('{{ role.role_name }}', this)" data-account-id="{{ account.id }}">View Policies</button>
+              </div>
+              <div id="details-{{ role.role_name }}" class="role-details hidden mt-2"></div>
             </li>
             {% endfor %}
           </ul>
@@ -42,49 +45,55 @@
     </div>
 
     <!-- Trusted Users Tab -->
-<div class="tab-pane fade" id="trusted-users" role="tabpanel" aria-labelledby="trusted-users-tab">
-  <div class="card mb-3">
-    <div class="card-header">
-      <h3>Trusted Users</h3>
-      <input type="text" id="trustedUserSearchInput" class="form-control mb-3" placeholder="Search Trusted Users" oninput="filterTrustedUsers()" />
-    </div>
-    <div class="card-body">
-      <ul class="list-group" id="trustedUserList">
-        {% if trusted_users %}
-        {% for role, users in trusted_users.items() %}
-        <li class="list-group-item trusted-user-role">
-          <strong>Role: {{ role }}</strong>
-          <ul class="list-group mt-2 trusted-user-list">
-            {% for user in users %}
-            <li class="list-group-item trusted-user-item">
-              <a href="{{ url_for('main.user_details', user_arn=user.user_arn) }}">{{ user.user_arn }}</a>
+    <div class="tab-pane fade" id="trusted-users" role="tabpanel" aria-labelledby="trusted-users-tab">
+      <div class="mb-3 p-4 bg-white border border-gray-300 rounded-md shadow-sm">
+        <div class="mb-2">
+          <h3 class="text-xl font-bold text-orange-600">Trusted Users</h3>
+          <input type="text" id="trustedUserSearchInput" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm mb-3" placeholder="Search Trusted Users" oninput="filterTrustedUsers()" />
+        </div>
+        <div>
+          <ul id="trustedUserList" class="list-group space-y-2">
+            {% if trusted_users %}
+            {% for role, users in trusted_users.items() %}
+            <li class="list-group-item trusted-user-role p-2 bg-gray-100 border border-gray-300 rounded-md">
+              <strong class="text-orange-600">Role: {{ role }}</strong>
+              <ul class="mt-2 list-group space-y-2 trusted-user-list">
+                {% for user in users %}
+                <li class="list-group-item trusted-user-item p-2 bg-white border border-gray-300 rounded-md">
+                  <div class="flex justify-between items-center">
+                    <a href="{{ url_for('main.user_details', user_arn=user.user_arn) }}" class="text-orange-600 hover:underline">{{ user.user_arn }}</a>
+                    <button class="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md" onclick="showUserDetails('{{ user.user_name }}', this)" data-account-id="{{ account.id }}">View Policies</button>
+                  </div>
+                  <div id="details-{{ user.user_name }}" class="user-details hidden mt-2"></div>
+                </li>
+                {% endfor %}
+              </ul>
             </li>
             {% endfor %}
+            {% else %}
+            <li class="list-group-item p-2 bg-gray-100 border border-gray-300 rounded-md">No trusted users found for this account.</li>
+            {% endif %}
           </ul>
-        </li>
-        {% endfor %}
-        {% else %}
-        <li class="list-group-item">No trusted users found for this account.</li>
-        {% endif %}
-      </ul>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
 
     <!-- IAM Users Tab -->
     <div class="tab-pane fade" id="iam-users" role="tabpanel" aria-labelledby="iam-users-tab">
-      <div class="card mb-3">
-        <div class="card-header">
-          <h3>IAM Users</h3>
-          <input type="text" id="userSearchInput" class="form-control mb-3" placeholder="Search IAM Users" oninput="filterList('userSearchInput', 'user-item')" />
+      <div class="mb-3 p-4 bg-white border border-gray-300 rounded-md shadow-sm">
+        <div class="mb-2">
+          <h3 class="text-xl font-bold text-orange-600">IAM Users</h3>
+          <input type="text" id="userSearchInput" class="block w-full bg-white border border-gray-300 text-orange-600 rounded-md py-2 px-3 shadow-sm focus:outline-none focus:border-orange-600 focus:ring-orange-600 focus:ring-1 sm:text-sm mb-3" placeholder="Search IAM Users" oninput="filterList('userSearchInput', 'user-item')" />
         </div>
-        <div class="card-body">
-          <ul class="list-group" id="userList">
+        <div>
+          <ul id="userList" class="list-group space-y-2">
             {% for user in users %}
-            <li class="list-group-item user-item">
-              <span style="cursor: pointer" onclick="showUserDetails('{{ user.user_name }}', this)">{{ user.user_name }}</span>
-              <div id="details-{{ user.user_name }}" class="user-details" style="display: none;"></div>
+            <li class="list-group-item user-item p-2 bg-gray-100 border border-gray-300 rounded-md">
+              <div class="flex justify-between items-center">
+                <span class="text-orange-600">{{ user.user_name }}</span>
+                <button class="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md" onclick="showUserDetails('{{ user.user_name }}', this)" data-account-id="{{ account.id }}">View Policies</button>
+              </div>
+              <div id="details-{{ user.user_name }}" class="user-details hidden mt-2"></div>
             </li>
             {% endfor %}
           </ul>
@@ -93,168 +102,10 @@
     </div>
   </div>
 
-  <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">Back to Accounts</a>
+  <a href="{{ url_for('main.index') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md mt-3">Back to Accounts</a>
 </section>
 
-<script>
-
- // Function to filter list items based on search input
-  function filterList(inputId, itemClass) {
-    const input = document.getElementById(inputId);
-    const filter = input.value.toLowerCase();
-    const items = document.querySelectorAll(`.${itemClass}`);
-
-    items.forEach(item => {
-      const text = item.textContent || item.innerText;
-      item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
-    });
-  }
-
-  // Function to filter both roles and users within the "Trusted Users" section
-  function filterTrustedUsers() {
-    const input = document.getElementById('trustedUserSearchInput');
-    const filter = input.value.toLowerCase();
-    const roles = document.querySelectorAll('.trusted-user-role');
-
-    roles.forEach(role => {
-      const roleTitle = role.querySelector('strong').textContent.toLowerCase();
-      const users = role.querySelectorAll('.trusted-user-item');
-      let roleVisible = false;
-
-      users.forEach(user => {
-        const userName = user.textContent.toLowerCase();
-        if (userName.includes(filter) || roleTitle.includes(filter)) {
-          user.style.display = '';
-          roleVisible = true;
-        } else {
-          user.style.display = 'none';
-        }
-      });
-
-      // Show the role if any nested user matches the filter, or if the role itself matches
-      role.style.display = roleVisible ? '' : 'none';
-    });
-  }
-
-  // Function to show role details
-  function showRoleDetails(roleName, element) {
-    const accountId = {{ account.id }};
-    const detailsContainer = document.getElementById(`details-${roleName}`);
-
-    if (detailsContainer.style.display === "block") {
-      detailsContainer.style.display = "none";
-      return;
-    }
-
-    // Hide other open details
-    document.querySelectorAll('.role-details').forEach(container => {
-      container.style.display = 'none';
-    });
-
-    fetch(`/role/${accountId}/${roleName}`)
-      .then(response => response.json())
-      .then(data => {
-        let roleDetailsHTML = '';
-
-        if (data.attached_policies.length > 0) {
-          roleDetailsHTML += generatePoliciesHTML('Attached Policies', data.attached_policies, roleName);
-        }
-
-        if (data.inline_policies.length > 0) {
-          roleDetailsHTML += generatePoliciesHTML('Inline Policies', data.inline_policies, roleName);
-        }
-
-        detailsContainer.innerHTML = roleDetailsHTML;
-        detailsContainer.style.display = "block";
-      })
-      .catch(error => {
-        console.error('Error fetching role details:', error);
-        alert('Failed to fetch role details. Please try again.');
-      });
-  }
-
-  // Function to show user details
-  function showUserDetails(userName, element) {
-    const accountId = {{ account.id }};
-    const detailsContainer = document.getElementById(`details-${userName}`);
-
-    if (detailsContainer.style.display === "block") {
-      detailsContainer.style.display = "none";
-      return;
-    }
-
-    // Hide other open details
-    document.querySelectorAll('.user-details').forEach(container => {
-      container.style.display = 'none';
-    });
-
-    fetch(`/user/${accountId}/${userName}`)
-      .then(response => response.json())
-      .then(data => {
-        let userDetailsHTML = '';
-
-        if (data.attached_policies.length > 0) {
-          userDetailsHTML += generatePoliciesHTML('Attached Policies', data.attached_policies, userName);
-        }
-
-        if (data.inline_policies.length > 0) {
-          userDetailsHTML += generatePoliciesHTML('Inline Policies', data.inline_policies, userName);
-        }
-
-        detailsContainer.innerHTML = userDetailsHTML;
-        detailsContainer.style.display = "block";
-      })
-      .catch(error => {
-        console.error('Error fetching user details:', error);
-        alert('Failed to fetch user details. Please try again.');
-      });
-  }
-
-  // Function to toggle policy document visibility
-  function togglePolicy(policyName, parentName) {
-    const policyElement = document.getElementById(`${parentName}-${policyName}`);
-
-    document.querySelectorAll('.policy-document').forEach(element => {
-      if (element !== policyElement) {
-        element.style.display = "none";
-      }
-    });
-
-    policyElement.style.display = policyElement.style.display === "none" ? "block" : "none";
-  }
-
-  // Helper function to generate policy HTML
-  function generatePoliciesHTML(title, policies, parentName) {
-    let html = `<div class="card mt-3"><div class="card-body"><h5>${title}:</h5><ul class="list-group mb-3">`;
-
-    policies.forEach(policy => {
-      html += `
-        <li class="list-group-item">
-          <span class="policy-name" style="cursor: pointer" onclick="togglePolicy('${policy.name}', '${parentName}')">
-            <i class="fas fa-caret-down"></i> ${policy.name}
-          </span>
-          <pre id="${parentName}-${policy.name}" class="policy-document" style="display: none">${JSON.stringify(policy.document, null, 2)}</pre>
-        </li>`;
-    });
-
-    html += `</ul></div></div>`;
-    return html;
-  }
-
-  // Function to filter list items based on search input
-  function filterList(inputId, itemClass) {
-    const input = document.getElementById(inputId);
-    const filter = input.value.toLowerCase();
-    const items = document.querySelectorAll(`.${itemClass}`);
-
-    items.forEach(item => {
-      const text = item.textContent || item.innerText;
-      item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
-    });
-  }
-</script>
-
-
-<!-- Bootstrap JS (including Popper) -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/account_details.js') }}"></script>
+{% endblock %}
 {% endblock %}
